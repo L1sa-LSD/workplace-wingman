@@ -245,8 +245,19 @@ function Index() {
                 }`}
               >
                 {m.role === "assistant" ? (
-                  <div className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
-                    <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
+                  <div>
+                    <div className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                      <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
+                    </div>
+                    {m.content && (
+                      <button
+                        onClick={() => copyMsg(i, m.content)}
+                        className="mt-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        {copiedIdx === i ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copiedIdx === i ? "Copied" : "Copy"}
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <p className="whitespace-pre-wrap">{m.content}</p>
