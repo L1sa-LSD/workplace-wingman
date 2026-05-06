@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Mail, FileText, ListChecks, Sparkles, Send, Bot, User, Loader2 } from "lucide-react";
+import { Mail, FileText, ListChecks, Sparkles, Send, Bot, User, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -37,7 +37,20 @@ function Index() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tone, setTone] = useState<"formal" | "informal" | "persuasive">("formal");
+  const [audience, setAudience] = useState<"client" | "manager" | "team">("client");
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const copyMsg = async (idx: number, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 1500);
+    } catch {
+      toast.error("Couldn't copy");
+    }
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -56,7 +69,7 @@ function Index() {
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, mode }),
+        body: JSON.stringify({ messages: next, mode, tone, audience }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -150,6 +163,48 @@ function Index() {
           })}
         </div>
 
+        {/* Email tone & audience controls */}
+        {mode === "email" && (
+          <div className="mb-4 grid gap-3 rounded-xl border border-border bg-card/40 p-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Tone</label>
+              <div className="flex flex-wrap gap-1.5">
+                {(["formal", "informal", "persuasive"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTone(t)}
+                    className={`rounded-md border px-2.5 py-1 text-xs capitalize transition-all ${
+                      tone === t
+                        ? "border-primary bg-primary/20 text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Audience</label>
+              <div className="flex flex-wrap gap-1.5">
+                {(["client", "manager", "team"] as const).map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setAudience(a)}
+                    className={`rounded-md border px-2.5 py-1 text-xs capitalize transition-all ${
+                      audience === a
+                        ? "border-primary bg-primary/20 text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Messages */}
         <div
           ref={scrollRef}
@@ -190,8 +245,19 @@ function Index() {
                 }`}
               >
                 {m.role === "assistant" ? (
-                  <div className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
-                    <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
+                  <div>
+                    <div className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+                      <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
+                    </div>
+                    {m.content && (
+                      <button
+                        onClick={() => copyMsg(i, m.content)}
+                        className="mt-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        {copiedIdx === i ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copiedIdx === i ? "Copied" : "Copy"}
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <p className="whitespace-pre-wrap">{m.content}</p>
