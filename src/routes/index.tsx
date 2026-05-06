@@ -37,7 +37,20 @@ function Index() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tone, setTone] = useState<"formal" | "informal" | "persuasive">("formal");
+  const [audience, setAudience] = useState<"client" | "manager" | "team">("client");
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const copyMsg = async (idx: number, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 1500);
+    } catch {
+      toast.error("Couldn't copy");
+    }
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
