@@ -44,14 +44,20 @@ export const Route = createFileRoute("/api/chat")({
           }
 
           const modeHints: Record<string, string> = {
-            email: "The user wants help drafting a professional email. Always include a Subject line, greeting, body, and closing.",
-            meeting: "The user wants a meeting summary. Output sections: Key Points, Decisions, Action Items (with owner + deadline).",
-            tasks: "The user wants a task plan. Prioritize by urgency/importance. Include time blocks and a balanced schedule.",
-            research: "The user wants research insights. Simplify, give key takeaways and recommendations.",
+            email: "The user wants help drafting a professional email. Always include a Subject line, greeting, body, and closing. Adapt language to the requested tone and audience.",
+            meeting: "The user wants a meeting summary. Output sections: Key Points, Decisions, Action Items (with owner + deadline), and Risks/Follow-ups if relevant.",
+            tasks: "The user wants a task plan. Prioritize with the Eisenhower matrix (urgent/important). Include time blocks, suggested breaks, and at least 2 time-optimization tips at the end.",
+            research: "The user wants research insights. Provide: TL;DR, Key Insights (bulleted), Recommendations, and a 'Verify' note listing what the user should fact-check.",
           };
 
+          const toneHint = tone && mode === "email" ? `\nTONE: Write in a ${tone} tone.` : "";
+          const audienceHint = audience && mode === "email" ? `\nAUDIENCE: Tailor the message for a ${audience}.` : "";
+
           const system =
-            SYSTEM_PROMPT + (mode && modeHints[mode] ? `\n\nCURRENT MODE: ${modeHints[mode]}` : "");
+            SYSTEM_PROMPT +
+            (mode && modeHints[mode] ? `\n\nCURRENT MODE: ${modeHints[mode]}` : "") +
+            toneHint +
+            audienceHint;
 
           const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
