@@ -163,6 +163,48 @@ function Index() {
           })}
         </div>
 
+        {/* Email tone & audience controls */}
+        {mode === "email" && (
+          <div className="mb-4 grid gap-3 rounded-xl border border-border bg-card/40 p-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Tone</label>
+              <div className="flex flex-wrap gap-1.5">
+                {(["formal", "informal", "persuasive"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTone(t)}
+                    className={`rounded-md border px-2.5 py-1 text-xs capitalize transition-all ${
+                      tone === t
+                        ? "border-primary bg-primary/20 text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Audience</label>
+              <div className="flex flex-wrap gap-1.5">
+                {(["client", "manager", "team"] as const).map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setAudience(a)}
+                    className={`rounded-md border px-2.5 py-1 text-xs capitalize transition-all ${
+                      audience === a
+                        ? "border-primary bg-primary/20 text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Messages */}
         <div
           ref={scrollRef}
