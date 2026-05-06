@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Mail, FileText, ListChecks, Sparkles, Send, Bot, User, Loader2 } from "lucide-react";
+import { Mail, FileText, ListChecks, Sparkles, Send, Bot, User, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
