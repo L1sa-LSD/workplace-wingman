@@ -28,9 +28,11 @@ export const Route = createFileRoute("/api/chat")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const { messages, mode } = (await request.json()) as {
+          const { messages, mode, tone, audience } = (await request.json()) as {
             messages: { role: "user" | "assistant"; content: string }[];
             mode?: string;
+            tone?: string;
+            audience?: string;
           };
 
           const apiKey = process.env.LOVABLE_API_KEY;
