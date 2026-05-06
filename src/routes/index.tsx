@@ -69,7 +69,7 @@ function Index() {
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, mode }),
+        body: JSON.stringify({ messages: next, mode, tone, audience }),
       });
 
       if (!resp.ok || !resp.body) {
